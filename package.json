@@ -1,0 +1,17 @@
+{
+  "name": "tds-dashboard",
+  "version": "1.0.0",
+  "description": "IoT TDS Monitoring Dashboard",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm start --prefix frontend\" \"npm start --prefix backend\"",
+    "start-frontend": "npm start --prefix frontend",
+    "start-backend": "npm start --prefix backend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
