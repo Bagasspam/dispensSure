@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "tds-dashboard",
   "version": "1.0.0",
   "description": "IoT TDS Monitoring Dashboard",
@@ -7,11 +8,26 @@
     "dev": "concurrently \"npm start --prefix frontend\" \"npm start --prefix backend\"",
     "start-frontend": "npm start --prefix frontend",
     "start-backend": "npm start --prefix backend"
+=======
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend for IoT TDS Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+>>>>>>> acce49a1cdac39667629038fb4a6a608c82c6a5e
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+<<<<<<< HEAD
   "devDependencies": {
     "concurrently": "^8.2.2"
+=======
+  "dependencies": {
+    "express": "^4.19.2",
+    "mqtt": "^5.3.6",
+    "ws": "^8.18.0"
+>>>>>>> acce49a1cdac39667629038fb4a6a608c82c6a5e
   }
 }
