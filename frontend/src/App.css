@@ -1,0 +1,265 @@
+/* Import font dari Google Fonts (juga bisa di sini jika tidak mau di index.html) */
+/* @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap'); */
+
+:root {
+  /* Definisi Palet Warna */
+  --primary-bg: #2c3e50;        /* Dark Blue - Background utama */
+  --secondary-bg: #34495e;      /* Slightly Lighter Dark Blue - Container background */
+  --accent-color: #2ecc71;      /* Emerald Green - Warna aksen/highlight */
+  --text-color: #ecf0f1;        /* Light Gray - Warna teks umum */
+  --card-bg: #4a6a8a;           /* Medium Blue-Gray - Background kartu nilai */
+  --shadow-color: rgba(0, 0, 0, 0.4); /* Warna bayangan lebih gelap */
+
+  /* Warna status koneksi */
+  --status-connected: #2ecc71;  /* Hijau */
+  --status-connecting: #f39c12; /* Oranye */
+  --status-disconnected: #e74c3c; /* Merah */
+  --status-error: #e74c3c;      /* Merah */
+}
+
+/* Pastikan HTML dan BODY bisa di-scroll secara default */
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: radial-gradient(circle at top left, var(--primary-bg) 0%, var(--secondary-bg) 100%); /* Radial Gradient Background */
+  color: var(--text-color);
+  min-height: 100vh;
+}
+
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.App-header {
+  width: 100%;
+  padding: 20px 0;
+  margin-bottom: 30px;
+  background-color: var(--secondary-bg);
+  box-shadow: 0 4px 10px var(--shadow-color);
+  border-radius: 8px;
+  max-width: 1200px;
+}
+
+.App-header h1 {
+  font-size: 2.5em;
+  font-weight: 700;
+  color: var(--accent-color);
+  margin: 0;
+  padding: 0 20px;
+}
+
+.dashboard-container {
+  display: grid; /* Gunakan CSS Grid untuk layout utama */
+  grid-template-columns: 1fr; /* HANYA 1 KOLOM SEKARANG: SEMUA AKAN STACK VERTIKAL */
+  grid-template-rows: auto auto auto auto; /* Baris menyesuaikan konten: status, update time, gauge, grafik */
+  gap: 30px; /* Jarak antar item grid */
+  width: 95%;
+  max-width: 1200px;
+  background-color: var(--secondary-bg);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px var(--shadow-color);
+}
+
+/* Penempatan item di Grid */
+.connection-status, .last-update-time {
+    grid-column: 1 / -1; /* Ambil seluruh lebar (dari kolom 1 sampai kolom terakhir) */
+    text-align: center;
+    padding: 10px 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: -15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.status-connected { background-color: var(--status-connected); }
+.status-connecting { background-color: var(--status-connecting); }
+.status-disconnected, .status-error { background-color: var(--status-disconnected); }
+
+
+.last-update-time {
+    font-size: 0.9em;
+    color: rgba(var(--text-color), 0.8);
+    margin-top: -20px;
+    margin-bottom: 15px;
+}
+
+
+.current-data-section {
+  grid-column: 1 / -1; /* Tetap ambil seluruh lebar, mereka akan berdampingan (flex) */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 30px;
+  margin-bottom: 0;
+}
+
+.data-card {
+  flex: 1 1 calc(50% - 30px); /* Mereka akan tetap 2 kolom di desktop */
+  min-width: 300px;
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.data-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.data-card h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 15px;
+}
+
+.CircularProgressbar-path {
+  transition: stroke-dashoffset 0.5s ease 0s;
+}
+
+.CircularProgressbar-trail {
+  stroke: rgba(255, 255, 255, 0.2);
+}
+
+.CircularProgressbar-text {
+  fill: var(--text-color);
+  font-size: 32px;
+  font-weight: 600;
+  dominant-baseline: middle;
+  text-anchor: middle;
+}
+
+.gauge-wrapper {
+  width: 200px;
+  height: 200px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.gauge-unit-text {
+    position: absolute;
+    top: calc(50% + 35px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.2em;
+    color: var(--text-color);
+}
+
+.chart-section {
+  grid-column: 1 / -1; /* PAKSA GRAFIK UNTUK SELALU MENGAMBIL LEBAR PENUH */
+  background-color: var(--card-bg);
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  margin-top: 0;
+}
+
+.chart-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.chart-section h3 {
+  margin-top: 0;
+  color: var(--accent-color);
+  font-size: 1.5em;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.chart-canvas-wrapper {
+    height: 350px;
+    width: 100%;
+    margin-bottom: 30px;
+}
+.chart-section .chart-canvas-wrapper:last-of-type {
+    margin-bottom: 0;
+}
+
+
+/* Responsif untuk Layar Kecil (Mobile) */
+@media (max-width: 768px) {
+  .App-header h1 {
+    font-size: 2em;
+  }
+
+  .dashboard-container {
+    grid-template-columns: 1fr; /* Sudah default 1fr di atas, tapi konfirmasi di sini */
+    gap: 20px;
+    padding: 20px;
+    width: 98%;
+  }
+
+  .connection-status, .last-update-time {
+      font-size: 1em;
+      margin-bottom: -10px;
+  }
+  .last-update-time {
+      margin-bottom: 10px;
+  }
+
+
+  .current-data-section {
+    flex-direction: column; /* Tetap stack vertikal untuk gauge di mobile */
+    gap: 20px;
+    grid-column: 1 / -1;
+  }
+
+  .data-card {
+    flex: 1 1 100%;
+    min-width: unset;
+  }
+
+  /* UKURAN GAUGE UNTUK LAYAR MOBILE */
+  .gauge-wrapper {
+    width: 80vw;
+    height: 80vw;
+    max-width: 300px;
+    max-height: 300px;
+    margin-bottom: 20px;
+  }
+
+  /* Ukuran teks nilai di dalam gauge untuk mobile */
+  .CircularProgressbar-text {
+    font-size: 15vw;
+    max-font-size: 48px;
+  }
+
+  /* Ukuran teks unit di dalam gauge untuk mobile */
+  .gauge-unit-text {
+    font-size: 1.8em;
+    top: calc(50% + 40px);
+  }
+
+  .chart-section {
+    grid-column: 1 / -1; /* Tetap full width di mobile */
+    padding: 15px;
+  }
+  .chart-section h3 {
+    font-size: 1.2em;
+  }
+}
