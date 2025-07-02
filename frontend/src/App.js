@@ -71,7 +71,7 @@ function getInterpolatedColor(value, minValue, maxValue, colorStops) {
 
 const TDS_COLOR_STOPS = [
   { position: 0.0, color: "#2ecc71" },
-  { position: 0.25, color: "#2ecc71" },
+  { position: 0.20, color: "#2ecc71" },
   { position: 0.4, color: "#f39c12" },
   { position: 0.6, color: "#e67e22" },
   { position: 1.0, color: "#e74c3c" },
