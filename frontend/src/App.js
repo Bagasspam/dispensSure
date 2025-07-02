@@ -100,13 +100,32 @@ function App() {
   useEffect(() => {
     // GANTI URL INI JIKA SUDAH DEPLOY KE RENDER/HOSTING LAIN!
     websocket.current = new WebSocket(
-      "wss://dispensure-d46e4eafb6fe.herokuapp.com/"
+      "wss://dispensure.live/"
     );
     // websocket.current = new WebSocket('ws://localhost:5000');
 
     websocket.current.onopen = () => {
       console.log("Koneksi WebSocket ke backend berhasil.");
       setWebsocketStatus("connected"); // Update status
+
+      // Setelah 4 detik, sembunyikan elemen
+      setTimeout(() => {
+        setShowConnectionStatus(false);
+      }, 3000);
+    };
+
+     websocket.current.onclose = () => {
+      console.log('Koneksi WebSocket ke backend terputus.');
+      setWebsocketStatus('disconnected');
+      setShowConnectionStatus(true);
+      setFadeOut(false); // Jangan hilangkan
+    };
+
+    websocket.current.onerror = (error) => {
+     console.error('WebSocket Error:', error);
+      setWebsocketStatus('error');
+      setShowConnectionStatus(true);
+      setFadeOut(false);
     };
 
     websocket.current.onmessage = (event) => {
@@ -131,20 +150,35 @@ function App() {
           return newTempData.slice(-30);
         });
         setCurrentTemp(data.temperature);
+
+        let kesimpulan = '';
+        let warna = '';
+        let ikon = '';
+
+        if (data.tds < 100) {
+          kesimpulan = 'Layak Diminum';
+          warna = '#2ecc71';
+          ikon = <span className="material-icons" style={{ fontSize: '60px', color: '#2ecc71' }}>check_circle</span>;
+        } else if (data.tds < 300) {
+          kesimpulan = 'Perlu Dimasak';
+          warna = '#f39c12';
+          ikon = <span className="material-icons" style={{ fontSize: '60px', color: '#2ecc71' }}>warning</span>;
+        } else {
+          kesimpulan = 'Tidak Layak Diminum';
+          warna = '#e74c3c';
+          ikon = <span className="material-icons" style={{ fontSize: '60px', color: '#2ecc71' }}>cancel</span>;
+        }
+
+        setKelayakanStatus({
+          status: kesimpulan,
+          color: warna,
+          icon: ikon,
+        });
+
+
       } catch (error) {
         console.error("Gagal parse JSON dari WebSocket:", error);
       }
-    };
-
-    websocket.current.onclose = () => {
-      console.log("Koneksi WebSocket ke backend terputus.");
-      setWebsocketStatus("disconnected"); // Update status
-      // Optional: Logic untuk mencoba reconnect WebSocket jika diinginkan
-    };
-
-    websocket.current.onerror = (error) => {
-      console.error("WebSocket Error:", error);
-      setWebsocketStatus("error"); // Update status
     };
 
     return () => {
@@ -256,27 +290,40 @@ function App() {
     ],
   };
 
+  const [showConnectionStatus, setShowConnectionStatus] = useState(true);
+  const [fadeOut, setFadeOut] = useState(false);
+
+  const [kelayakanStatus, setKelayakanStatus] = useState(null);
+
+
+  function getKelayakanAir(tds, temp) {
+  if (tds < 300 && temp <= 30) {
+    return { status: 'Layak Diminum', color: '#2ecc71' }; // Hijau
+  } else if (tds < 500 && temp <= 35) {
+    return { status: 'Perlu Dimasak', color: '#f39c12' }; // Kuning
+  } else {
+    return { status: 'Tidak Layak Minum', color: '#e74c3c' }; // Merah
+  }
+}
+
+
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Monitoring Kualitas Air IoT</h1>
+        <h1>DIspenSure - Monitoring Kualitas Air IoT</h1>
       </header>
 
       <div className="dashboard-container">
         {/* Status Koneksi WebSocket */}
-        <div className={`connection-status status-${websocketStatus}`}>
-          Status Koneksi:{" "}
-          {websocketStatus === "connected"
-            ? "Terhubung"
-            : websocketStatus === "connecting"
-            ? "Menghubungkan..."
-            : websocketStatus === "disconnected"
-            ? "Terputus"
-            : "Error"}
-        </div>
-        {lastUpdateTime && (
-          <div className="last-update-time">
-            Pembaruan Terakhir: {lastUpdateTime.toLocaleTimeString()}
+        {showConnectionStatus && (
+          <div
+            className={`connection-status status-${websocketStatus} ${websocketStatus === 'connected' && fadeOut ? 'fade-out' : ''}`}
+          >
+            Status Koneksi: {
+              websocketStatus === 'connected' ? 'Terhubung' :
+              websocketStatus === 'connecting' ? 'Menghubungkan...' :
+              websocketStatus === 'disconnected' ? 'Terputus' : 'Error'
+            }
           </div>
         )}
 
@@ -331,6 +378,25 @@ function App() {
           </div>
         </div>
 
+       <div className="kelayakan-container">
+          <h2>Status Kelayakan Air</h2>
+          <div className="kelayakan-icon">
+            {kelayakanStatus
+              ? kelayakanStatus.icon
+              : <span class="material-icons" style={{ fontSize: '60px', color: '#5EABD6' }}>water_drop</span>} {/* Default jika belum ada data */}
+          </div>
+          <div
+            className="kelayakan-status"
+            style={{
+              backgroundColor: kelayakanStatus ? kelayakanStatus.color : '#bdc3c7',
+            }}
+          >
+            {kelayakanStatus ? kelayakanStatus.status : 'Menunggu Data...'}
+          </div>
+        </div>
+
+
+
         {/* Bagian untuk Grafik */}
         <div className="chart-section">
           <h3>Data Sensor Historis TDS</h3>
@@ -348,6 +414,11 @@ function App() {
             <Line data={chartTempData} options={chartOptions} />
           </div>
         </div>
+         {lastUpdateTime && (
+          <div className="last-update-time">
+            Pembaruan Terakhir: {lastUpdateTime.toLocaleTimeString()}
+          </div>
+        )}
       </div>
     </div>
   );
